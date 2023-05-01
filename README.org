@@ -1,0 +1,3 @@
+#+title: Ray Tracing Challenge
+
+Using simd to build a rust ray tracer.

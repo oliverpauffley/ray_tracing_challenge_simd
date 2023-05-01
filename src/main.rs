@@ -1,7 +1,13 @@
 #![feature(portable_simd)]
-use std::simd::f32x4;
+
+use crate::point::Point;
+mod point;
+mod vector;
+
 fn main() {
-    let a = f32x4::splat(10.0);
-    let b = f32x4::from_array([1.0, 2.0, 3.0, 4.0]);
-    println!("{:?}", a + b);
+
+    let a = Point::new(1.0, 1.0, 1.0);
+    let b = Point::new(1.0, 1.0, 1.0);
+
+    println!("{:?}, {:?}, {}", a,  b, a==b);
 }
