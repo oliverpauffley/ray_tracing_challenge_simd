@@ -1,4 +1,4 @@
-use std::ops::{Add, Neg, Sub};
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 pub struct Vector(pub std::simd::f64x4);
@@ -16,18 +16,44 @@ impl Vector {
 }
 
 impl Add<Vector> for Vector {
-    type Output = Vector;
+    type Output = Self;
 
-    fn add(self, rhs: Vector) -> Self::Output {
-        Vector(self.0 + rhs.0)
+    fn add(self, rhs: Self) -> Self::Output {
+        Self(self.0 + rhs.0)
     }
 }
 
 impl Sub<Vector> for Vector {
-    type Output = Vector;
+    type Output = Self;
 
-    fn sub(self, rhs: Vector) -> Self::Output {
-        Vector(self.0 - rhs.0)
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self(self.0 - rhs.0)
+    }
+}
+
+impl Mul<f64> for Vector {
+    type Output = Self;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self(std::simd::f64x4::from_array([
+            self.0[0] * rhs,
+            self.0[1] * rhs,
+            self.0[2] * rhs,
+            self.0[3],
+        ]))
+    }
+}
+
+impl Div<f64> for Vector {
+    type Output = Self;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        Self(std::simd::f64x4::from_array([
+            self.0[0] / rhs,
+            self.0[1] / rhs,
+            self.0[2] / rhs,
+            self.0[3],
+        ]))
     }
 }
 
@@ -83,5 +109,15 @@ mod test_vector {
         let want = Vector::new(-1.0, -2.0, -3.0);
 
         assert_eq!(want, -v);
+    }
+
+    #[test]
+    fn multiply_vector_scalar() {
+        let v = Vector::new(1.0, 2.0, 3.0);
+        let scalar = 3.0;
+
+        let want = Vector::new(3.0, 6.0, 9.0);
+
+        assert_eq!(want, v * scalar);
     }
 }

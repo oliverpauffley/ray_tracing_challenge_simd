@@ -1,4 +1,7 @@
-use std::ops::{Add, Neg, Sub};
+use std::{
+    ops::{Add, Div, Mul, Neg, Sub},
+    simd,
+};
 
 use crate::vector::Vector;
 
@@ -37,7 +40,33 @@ impl Sub<Vector> for Point {
     type Output = Point;
 
     fn sub(self, rhs: Vector) -> Self::Output {
-        Point(self.0 - rhs.0)
+        Self(self.0 - rhs.0)
+    }
+}
+
+impl Mul<f64> for Point {
+    type Output = Point;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self(std::simd::f64x4::from_array([
+            self.0[0] * rhs,
+            self.0[1] * rhs,
+            self.0[2] * rhs,
+            self.0[3],
+        ]))
+    }
+}
+
+impl Div<f64> for Point {
+    type Output = Self;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        Self(std::simd::f64x4::from_array([
+            self.0[0] / rhs,
+            self.0[1] / rhs,
+            self.0[2] / rhs,
+            self.0[3],
+        ]))
     }
 }
 
@@ -87,5 +116,15 @@ mod test_point {
         let want = Point::new(-2.0, -4.0, -6.0);
 
         assert_eq!(want, p - v);
+    }
+
+    #[test]
+    fn multiply_point_scalar() {
+        let p = Point::new(1.0, 2.0, 3.0);
+        let scalar = 3.0;
+
+        let want = Point::new(3.0, 6.0, 9.0);
+
+        assert_eq!(want, p * scalar);
     }
 }
