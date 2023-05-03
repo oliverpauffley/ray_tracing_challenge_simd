@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, Div, Index, Mul, Neg, Sub};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 pub struct Vector(pub std::simd::f64x4);
@@ -25,6 +25,25 @@ impl Vector {
     }
 }
 
+#[derive(Debug)]
+pub enum Direction {
+    X,
+    Y,
+    Z,
+}
+
+impl Index<Direction> for Vector {
+    type Output = f64;
+
+    fn index(&self, index: Direction) -> &Self::Output {
+        match index {
+            Direction::X => &self.0[0],
+            Direction::Y => &self.0[1],
+            Direction::Z => &self.0[2],
+        }
+    }
+}
+
 /// Calculate the vector dot product.
 /// ```
 ///
@@ -33,7 +52,28 @@ impl Vector {
 
 /// assert_eq!(20.0, dot(a, b))
 pub fn dot(a: Vector, b: Vector) -> f64 {
-    a.0[0] * b.0[0] + a.0[1] * b.0[1] + a.0[2] * b.0[2]
+    use Direction::*;
+    a[X] * b[X] + a[Y] * b[Y] + a[Z] * b[Z]
+}
+
+/// Calculate the vector cross product.
+/// Finds the perpendicular vector to two vectors
+/// let a = Vector::new(1.0, 2.0, 3.0);
+/// let b = Vector::new(2.0, 3.0, 4.0);
+
+/// let a_b = Vector::new(-1.0, 2.0, -1.0);
+/// let b_a = Vector::new(1.0, -2.0, 1.0);
+
+/// assert_eq!(a_b, cross(a, b));
+/// assert_eq!(b_a, cross(b, a));
+pub fn cross(a: Vector, b: Vector) -> Vector {
+    use Direction::*;
+
+    Vector::new(
+        a[Y] * b[Z] - a[Z] * b[Y],
+        a[Z] * b[X] - a[X] * b[Z],
+        a[X] * b[Y] - a[Y] * b[X],
+    )
 }
 
 impl Add<Vector> for Vector {
@@ -185,5 +225,17 @@ mod test_vector {
         let b = Vector::new(2.0, 3.0, 4.0);
 
         assert_eq!(20.0, dot(a, b))
+    }
+
+    #[test]
+    fn compute_cross_product() {
+        let a = Vector::new(1.0, 2.0, 3.0);
+        let b = Vector::new(2.0, 3.0, 4.0);
+
+        let a_b = Vector::new(-1.0, 2.0, -1.0);
+        let b_a = Vector::new(1.0, -2.0, 1.0);
+
+        assert_eq!(a_b, cross(a, b));
+        assert_eq!(b_a, cross(b, a));
     }
 }

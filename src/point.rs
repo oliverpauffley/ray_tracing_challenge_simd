@@ -1,6 +1,6 @@
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Div, Index, Mul, Sub};
 
-use crate::vector::Vector;
+use crate::vector::{Direction, Vector};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 pub struct Point(pub std::simd::f64x4);
@@ -45,10 +45,11 @@ impl Mul<f64> for Point {
     type Output = Point;
 
     fn mul(self, rhs: f64) -> Self::Output {
+        use Direction::*;
         Self(std::simd::f64x4::from_array([
-            self.0[0] * rhs,
-            self.0[1] * rhs,
-            self.0[2] * rhs,
+            self[X] * rhs,
+            self[Y] * rhs,
+            self[Z] * rhs,
             self.0[3],
         ]))
     }
@@ -58,12 +59,25 @@ impl Div<f64> for Point {
     type Output = Self;
 
     fn div(self, rhs: f64) -> Self::Output {
+        use Direction::*;
         Self(std::simd::f64x4::from_array([
-            self.0[0] / rhs,
-            self.0[1] / rhs,
-            self.0[2] / rhs,
+            self[X] / rhs,
+            self[Y] / rhs,
+            self[Z] / rhs,
             self.0[3],
         ]))
+    }
+}
+
+impl Index<Direction> for Point {
+    type Output = f64;
+
+    fn index(&self, index: Direction) -> &Self::Output {
+        match index {
+            Direction::X => &self.0[0],
+            Direction::Y => &self.0[1],
+            Direction::Z => &self.0[2],
+        }
     }
 }
 
