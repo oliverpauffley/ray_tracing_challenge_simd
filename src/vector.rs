@@ -13,6 +13,27 @@ impl Vector {
         let vec_vals = [vals[0], vals[1], vals[2], 0.0];
         Self(std::simd::f64x4::from_array(vec_vals))
     }
+
+    /// Calculate the magnitude of a vector.
+    pub fn mag(&self) -> f64 {
+        f64::sqrt(self.0.as_array().iter().map(|x| x * x).sum())
+    }
+
+    /// Normalize a vector by scaling by it's magnitude.
+    pub fn norm(self) -> Vector {
+        self / self.mag()
+    }
+}
+
+/// Calculate the vector dot product.
+/// ```
+///
+/// let a = Vector::new(1.0, 2.0, 3.0);
+/// let b = Vector::new(2.0, 3.0, 4.0);
+
+/// assert_eq!(20.0, dot(a, b))
+pub fn dot(a: Vector, b: Vector) -> f64 {
+    a.0[0] * b.0[0] + a.0[1] * b.0[1] + a.0[2] * b.0[2]
 }
 
 impl Add<Vector> for Vector {
@@ -119,5 +140,50 @@ mod test_vector {
         let want = Vector::new(3.0, 6.0, 9.0);
 
         assert_eq!(want, v * scalar);
+    }
+
+    #[test]
+    fn magnitude_of_vector() {
+        let v = Vector::new(1.0, 0.0, 0.0);
+        assert_eq!(1.0, v.mag());
+
+        let v = Vector::new(0.0, 1.0, 0.0);
+        assert_eq!(1.0, v.mag());
+
+        let v = Vector::new(0.0, 0.0, 1.0);
+        assert_eq!(1.0, v.mag());
+
+        let v = Vector::new(1.0, 2.0, 3.0);
+        assert_eq!(f64::sqrt(14.0), v.mag());
+
+        let v = Vector::new(1.0, 2.0, 3.0).neg();
+        assert_eq!(f64::sqrt(14.0), v.mag());
+    }
+
+    #[test]
+    fn normalize_vectors() {
+        let v = Vector::new(4.0, 0.0, 0.0);
+
+        let want = Vector::new(1.0, 0.0, 0.0);
+        assert_eq!(want, v.norm());
+        assert_eq!(1.0, v.norm().mag());
+
+        let v = Vector::new(1.0, 2.0, 3.0);
+
+        let want = Vector::new(
+            1.0 / f64::sqrt(14.0),
+            2.0 / f64::sqrt(14.0),
+            3.0 / f64::sqrt(14.0),
+        );
+        assert_eq!(want, v.norm());
+        assert_eq!(1.0, v.norm().mag())
+    }
+
+    #[test]
+    fn compute_dot_product() {
+        let a = Vector::new(1.0, 2.0, 3.0);
+        let b = Vector::new(2.0, 3.0, 4.0);
+
+        assert_eq!(20.0, dot(a, b))
     }
 }

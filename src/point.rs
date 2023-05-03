@@ -1,7 +1,4 @@
-use std::{
-    ops::{Add, Div, Mul, Neg, Sub},
-    simd,
-};
+use std::ops::{Add, Div, Mul, Sub};
 
 use crate::vector::Vector;
 
